@@ -1,6 +1,6 @@
 ---
 title: 'Tipología y ciclo de vida de los datos'
-subtitle: 'PRÁCTICA 1: Limpieza y análisis de datos'
+subtitle: 'PRÁCTICA 2: Limpieza y análisis de datos'
 author: "Autores: Raúl Vicente Ferrer y Carmen Lobato Cassinello"
 date: "Diciembre 2021"
 output:
