@@ -1,0 +1,89 @@
+---
+title: 'Tipología y ciclo de vida de los datos'
+subtitle: 'PRÁCTICA 1: Limpieza y análisis de datos'
+author: "Autores: Raúl Vicente Ferrer y Carmen Lobato Cassinello"
+date: "Diciembre 2021"
+output:
+  pdf_document:
+    highlight: zenburn
+    toc: yes
+header-includes:
+  - \usepackage {hyperref}
+  - \hypersetup {colorlinks = true, linkcolor = blue, urlcolor = blue}
+---
+
+## 1. Descripción del dataset.
+
+**¿Qué conjunto de datos se ha utilizado?**
+
+El dataset utilizado para esta práctica es el resultante de la ejecución de la práctica anterior: **HouseRentingSpainGermany.csv**.
+
+El conjunto de datos recoge información sobre el precio de alquiler por metro cuadrado en las viviendas de las mayores ciudades de España y Alemania:
+
+* España: Madrid, Barcelona, Valencia, Sevilla y Zaragoza.
+* Alemania: Berlín, Hamburgo, Munich, Colonia y Frankfurt.
+
+Cada uno de estos registros se corresponde a una única vivienda.
+
+Los datos del dataset son de tipo carácter o numérico, quedando excluidos otros tipos de variables.
+
+**¿Por qué es importante y qué pregunta pretende responder?**
+
+En una época en la que la movilidad internacional está cada vez más presente en la carrera profesional de los trabajadores, se observa un incremento de la emigración de los jóvenes españoles. Uno de los destinos más solicitados es Alemania, lo cual ha dado lugar a multitud de debates a lo largo de los últimos años; entre ellos, uno de los más recurrentes es la diferencia de precios entre ambos países. Esta cuestión genera reticencia en muchas personas a la hora de dar el paso de emigrar.
+
+Afortunadamente, gracias a digitalización de las agencias y a la aparición de páginas de consolidación de información, la información sobre el precio del alquiler está al alcance de todos. El conjunto de datos utilizado proporciona información sobre el valor de la vivienda en ambos países: de los gastos a los que hay que hacer frente a diario, el mayor será el alquiler del lugar de residencia. Este dato nos puede dar una idea de lo caro que será vivir en una determinada ciudad, eliminando la subjetividad a la hora de debatir si es más caro vivir en España o en Alemania; los datos están ahí, se pueden recopilar y estudiar, y su análisis puede ayudarnos a tomar la decisión de emigrar o no. También pueden emplearse para comparar el precio de alquiler en diferentes ciudades dentro de uno de los dos países.
+
+
+## 2. Integración y selección de los datos de interés a analizar.
+
+
+
+## 3. Limpieza de los datos.
+
+### 3.1 ¿Los datos contienen ceros o elementos vacíos? ¿Cómo gestionarías cada uno de estos casos?
+
+### 3.2 Identificación y tratamiento de valores extremos.
+
+
+
+## 4. Análisis de los datos.
+
+### 4.1 Selección de los grupos de datos que se quieren analizar/comparar (planificación de los análisis a aplicar).
+
+### 4.2 Comprobación de la normalidad y homogeneidad de la varianza.
+
+### 4.3 Aplicación de pruebas estadísticas para comparar los grupos de datos. En función de los datos y el objetivo del estudio, aplicar pruebas de contraste de hipótesis, correlaciones, regresiones, etc. Aplicar al menos tres métodos de análisis diferentes.
+
+
+## 5. Representación de los resultados a partir de tablas y gráficas.
+
+
+
+## 6. Resolución del problema. A partir de los resultados obtenidos, ¿cuáles son las conclusiones? ¿Los resultados permiten responder al problema?
+
+
+
+## 7. Código: Hay que adjuntar el código, preferiblemente en R, con el que se ha realizado la limpieza, análisis y representación de los datos. Si lo preferís, también podéis trabajar en Python.
+
+El código utilizado para el análisis de la información se puede encontrar en la siguiente [URL](https://github.com/clobatoc21/HouseRentingPriceAnalyzer).
+
+
+## Agradecimientos.
+
+Los datos utilizados fueron recolectados de las páginas webs [Idealista](https://www.idealista.com/) y [WG-Gesucht](https://www.wg-gesucht.de/es/).
+
+Las páginas mencionadas, o los terceros con los que tienen acuerdos, son los propietarios de todo el contenido que aparece en sus webs; adicionalmente, en estas páginas se realiza un trabajo de procesamiento de datos previo a la muestra de contenido a los usuarios. Idealista y WG-Gesucht serán, por tanto, propietarios de los datos utilizados en esta práctica.
+
+
+## Licencia.
+
+Estos datos están sometidos a la licencia **Released Under CC BY-NC-SA 4.0 License**, la cual ofrece libertades a los usuarios a la par que derechos a los propietarios. Se permite su distribución, se reconoce al autor de la obra y se permite editar el código fuente. No obstante, no se permite lucrarse económicamente con el mismo ni privatizar el software con una licencia que altere las libertades anteriormente expuestas. Los propietarios de los datos serán siempre Idealista y WG-Gesucht, y así deberá hacerse saber en cualquier utilización de los mismos.
+
+
+## Tabla contribuciones
+
+**Contribuciones** |**Firma** |
+----------------------| ----------------------|
+*Investigación Previa* | Carmen Lobato Cassinello, Raúl Vicente Ferrer |
+*Redacción de las respuestas* | Carmen Lobato Cassinello, Raúl Vicente Ferrer |
+*Desarrollo del código* | Carmen Lobato Cassinello, Raúl Vicente Ferrer 
