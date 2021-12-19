@@ -7,6 +7,7 @@ This analysis was performed as part of the subject "Tipología y ciclo de vida d
 
 # Files
 **INCLUIR ARCHIVOS GENERADOS Y SU DESCRIPCIÓN**
+- HouseRentingSpainGermany.csv: it contains the original dataset, obtained from scraping the websites mentioned in the description.
 
 # Libraries
 **INCLUIR LIBRERÍAS UTILIZADAS**
