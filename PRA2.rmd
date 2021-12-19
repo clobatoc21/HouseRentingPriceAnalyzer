@@ -63,7 +63,7 @@ Afortunadamente, gracias a digitalización de las agencias y a la aparición de 
 
 
 
-## 7. Código: Hay que adjuntar el código, preferiblemente en R, con el que se ha realizado la limpieza, análisis y representación de los datos. Si lo preferís, también podéis trabajar en Python.
+## 7. Código.
 
 El código utilizado para el análisis de la información se puede encontrar en la siguiente [URL](https://github.com/clobatoc21/HouseRentingPriceAnalyzer).
 
