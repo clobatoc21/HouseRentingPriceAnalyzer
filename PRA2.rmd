@@ -2,7 +2,7 @@
 title: 'Tipología y ciclo de vida de los datos'
 subtitle: 'PRÁCTICA 2: Limpieza y análisis de datos'
 author: "Autores: Raúl Vicente Ferrer y Carmen Lobato Cassinello"
-date: "Diciembre 2021"
+date: "Enero 2022"
 output:
   pdf_document:
     highlight: zenburn
@@ -16,22 +16,35 @@ header-includes:
 
 **¿Qué conjunto de datos se ha utilizado?**
 
-El dataset utilizado para esta práctica es el resultante de la ejecución de la práctica anterior: **HouseRentingSpainGermany.csv**.
+Para la realización de esta práctica se ha utilizado el conjunto de entrenamiento de *Titanic: Machine Learning from Disaster* (kaggle), el cual se puede encontrar en la siguiente [URL](https://www.kaggle.com/c/titanic/data). Se ha renombrado como "train_titanic.csv".
 
-El conjunto de datos recoge información sobre el precio de alquiler por metro cuadrado en las viviendas de las mayores ciudades de España y Alemania:
+El conjunto de datos recoge información sobre los pasajeros a borde del Titanic cuando el buque chocó contra el iceberg:
 
-* España: Madrid, Barcelona, Valencia, Sevilla y Zaragoza.
-* Alemania: Berlín, Hamburgo, Munich, Colonia y Frankfurt.
+* PassengerId: contiene el identificador numérico del pasajero.
+* Survived [0, 1]: describe si el pasajero sobrevivió o no al hundimiento del buque.
+* Pclass [1, 2, 3]: descibe la clase en la que viajaba el pasajero.
+* Name: describe el nombre completo del pasajero.
+* Sex [male, female]: describe el género del pasajero.
+* Age: descibe la edad del pasajero en años.
+* SibSp: describe el número de hermanos/as o esposos/as del pasajero a bordo del buque.
+* ParCh: descibe el número de padres o hijos del pasajero a bordo del buque.
+* Ticket: descibe el número de billete del pasajero.
+* Fare: describe el precio del billete que llevaba el pasajero.
+* Cabin: describe la cabina en la que viajaba el pasajero.
+* Embarked [C, Q, S]: describe el puerto de embarque del pasajero.
 
-Cada uno de estos registros se corresponde a una única vivienda.
+Cada uno de los registros se corresponde con un único viajero.
 
 Los datos del dataset son de tipo carácter o numérico, quedando excluidos otros tipos de variables.
 
 **¿Por qué es importante y qué pregunta pretende responder?**
 
-En una época en la que la movilidad internacional está cada vez más presente en la carrera profesional de los trabajadores, se observa un incremento de la emigración de los jóvenes españoles. Uno de los destinos más solicitados es Alemania, lo cual ha dado lugar a multitud de debates a lo largo de los últimos años; entre ellos, uno de los más recurrentes es la diferencia de precios entre ambos países. Esta cuestión genera reticencia en muchas personas a la hora de dar el paso de emigrar.
+El conjunto tratado resulta relevante porque nos ayuda a comprender mejor el funcionamiento de la sociedad en 1912, permitiéndonos analizar la evolución hasta la época actual y encontrar potenciales puntos de mejora.
 
-Afortunadamente, gracias a digitalización de las agencias y a la aparición de páginas de consolidación de información, la información sobre el precio del alquiler está al alcance de todos. El conjunto de datos utilizado proporciona información sobre el valor de la vivienda en ambos países: de los gastos a los que hay que hacer frente a diario, el mayor será el alquiler del lugar de residencia. Este dato nos puede dar una idea de lo caro que será vivir en una determinada ciudad, eliminando la subjetividad a la hora de debatir si es más caro vivir en España o en Alemania; los datos están ahí, se pueden recopilar y estudiar, y su análisis puede ayudarnos a tomar la decisión de emigrar o no. También pueden emplearse para comparar el precio de alquiler en diferentes ciudades dentro de uno de los dos países.
+Los datos analizados pretenden dar respuesta a varias preguntas; entre ellas:
+1. ¿Cómo se relacionan la clase, el género y la edad con la tasa de suprervivencia?
+2. ¿Cuántas personas viajaban solas? ¿Y con familia? ¿Cómo se relaciona esto con la tasa de supervivencia?
+3. ¿Tiene algo que ver el puerto de embarque con la tasa de supervivencia?
 
 
 ## 2. Integración y selección de los datos de interés a analizar.
@@ -39,6 +52,20 @@ Afortunadamente, gracias a digitalización de las agencias y a la aparición de 
 
 
 ## 3. Limpieza de los datos.
+
+Como primer paso, antes de comenzar la limpieza, realizamos la carga del conjunto a estudiar:
+
+```{r}
+titanic_data <-read.csv("./train_titanic.csv",header=T,sep=",")
+```
+
+Calcularemos ahora las dimensiones del conjunto:
+
+```{r}
+dim(data)
+```
+
+Observamos que el conjunto analizado se compone de 891 registros y 12 variables.
 
 ### 3.1 ¿Los datos contienen ceros o elementos vacíos? ¿Cómo gestionarías cada uno de estos casos?
 
