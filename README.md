@@ -11,6 +11,7 @@ This analysis was performed as part of the subject "Tipología y ciclo de vida d
 
 # Libraries
 - dplyr
+- ggplot2
 
 # Resources
 - Calvo M., Subirats L., Pérez D. (2019). Introducción a la limpieza y análisis de los datos. Editorial UOC.
