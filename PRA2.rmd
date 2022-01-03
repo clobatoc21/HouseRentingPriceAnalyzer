@@ -127,19 +127,19 @@ hist(titanic_data$Parch)
 
 ## 7. Código.
 
-El código utilizado para el análisis de la información se puede encontrar en la siguiente [URL](https://github.com/clobatoc21/HouseRentingPriceAnalyzer).
+El código utilizado para el análisis de la información se puede encontrar en la siguiente [URL](https://github.com/clobatoc21/TitanicSurvivalAnalyzer).
 
 
 ## Agradecimientos.
 
-Los datos utilizados fueron recolectados de las páginas webs [Idealista](https://www.idealista.com/) y [WG-Gesucht](https://www.wg-gesucht.de/es/).
+Los datos utilizados han sido recolectados del repositorio [Kaggle](https://www.kaggle.com/c/titanic/overview).
 
-Las páginas mencionadas, o los terceros con los que tienen acuerdos, son los propietarios de todo el contenido que aparece en sus webs; adicionalmente, en estas páginas se realiza un trabajo de procesamiento de datos previo a la muestra de contenido a los usuarios. Idealista y WG-Gesucht serán, por tanto, propietarios de los datos utilizados en esta práctica.
+Por este motivo, ellos son los propietarios de los datos utilizados en esta práctica.
 
 
 ## Licencia.
 
-Estos datos están sometidos a la licencia **Released Under CC BY-NC-SA 4.0 License**, la cual ofrece libertades a los usuarios a la par que derechos a los propietarios. Se permite su distribución, se reconoce al autor de la obra y se permite editar el código fuente. No obstante, no se permite lucrarse económicamente con el mismo ni privatizar el software con una licencia que altere las libertades anteriormente expuestas. Los propietarios de los datos serán siempre Idealista y WG-Gesucht, y así deberá hacerse saber en cualquier utilización de los mismos.
+Estos datos están sometidos a la licencia **Released Under CC BY-NC-SA 4.0 License**, la cual ofrece libertades a los usuarios a la par que derechos a los propietarios. Se permite su distribución, se reconoce al autor de la obra y se permite editar el código fuente. No obstante, no se permite lucrarse económicamente con el mismo ni privatizar el software con una licencia que altere las libertades anteriormente expuestas. El propietario de los datos será siempre Kaggle, y así deberá hacerse saber en cualquier utilización de los mismos.
 
 
 ## Tabla contribuciones
