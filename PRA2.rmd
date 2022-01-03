@@ -63,7 +63,7 @@ Los datos analizados pretenden dar respuesta a varias preguntas; entre ellas:
 Como primer paso, realizamos la carga del conjunto a estudiar:
 
 ```{r}
-titanic_data <-read.csv("./train_titanic.csv", header=T, sep=",", stringsAsFactors = FALSE, fileEncoding = "UTF-8", na.strings=c("NA", ""))
+titanic_data <- read.csv("./train_titanic.csv", header=T, sep=",", stringsAsFactors = FALSE, fileEncoding = "UTF-8", na.strings=c("NA", ""))
 ```
 
 Calcularemos ahora las dimensiones del conjunto y analizaremos el tipo de variable correspondiente con cada columna:
@@ -79,7 +79,7 @@ Observamos que el fichero contiene 891 registros, correspondientes a las 12 vari
 - Numéricas continuas: Age, Fare
 - Texto: Name, Ticket, Cabin
 
-Para el estudio a realizar no todas las variables serán necesarias. En concreto, las variables que no aportan información global, se eliminan: 
+Para el estudio a realizar, no todas las variables serán necesarias. En concreto, las variables que no aportan información global no resultan relevantes, por lo que se eliminan: 
 * PassengerId
 * Name
 * Ticket
@@ -109,29 +109,113 @@ Estudiaremos ahora si nuestros datos contienen elementos vacíos:
 colSums(is.na(titanic_data))
 ```
 
-Observamos que tenemos elementos vacíos en las columnas "Age", "Cabin" y "Embarked":
+Observamos que tenemos elementos vacíos en las columnas "Age" y "Embarked":
 
-- Age: Nos faltan 177 datos de los 891 registros (19,9%). Realizaremos una regresión en base al resto de variables para asociar una edad.
+- Age: Nos faltan 177 datos de los 891 registros (19,9%). Realizaremos una inferencia en base al resto de variables para asociar una edad.
 - Embarked: Nos faltan 2 datos de los 891 registros (0,2%). Evaluaremos si tiene sentido asumir que pertenecen a un determinado grupo (en función del resto de características); si no es posible categorizar a estos pasajeros, eliminaremos los registros.
+
+##### Age
+
+Como primer paso para realizar nuestra inferencia, seleccionamos las variables que resultan de interés a la hora de predecir la edad de los pasajeros: su género, la clase en la que viajaba, y la supervivencia al hundimiento.
+Agrupamos los datos por Sex, Pclass y Survived y calculamos la mediana para cada grupo (esta medida es más resistente a outliers que la media):
+
+```{r}
+grouped_titanic_data_median <- titanic_data %>% group_by(Sex, Pclass, Survived) %>% summarise(median = median(Age, na.rm = TRUE))
+grouped_titanic_data_median
+```
+
+Rellenaremos ahora los valores perdidos con la medida que acabamos de calcular:
+
+```{r}
+for (sex in c("female", "male")){
+  for (class in c("1", "2", "3")){
+    for (survived in c("0", "1")){
+      titanic_data$Age[titanic_data$Sex == sex & titanic_data$Pclass == class & titanic_data$Survived == survived & is.na(titanic_data$Age)] <- grouped_titanic_data_median$median[grouped_titanic_data_median$Sex == sex & grouped_titanic_data_median$Pclass == class & grouped_titanic_data_median$Survived == survived]
+    }
+  }
+}
+```
+
+##### Embarked
+
+Observamos las características de los dos pasajeros cuyo puerto de embarque desconocemos:
+
+```{r}
+titanic_data[is.na(titanic_data$Embarked),]
+```
+
+Vemos que ambas pasajeras eran mujeres de primera clase que viajaban solas y sobrevivieron al accidente. Observamos la distribución de puertos en pasajeras con las mismas características:
+
+```{r}
+barplot(table(titanic_data$Embarked[titanic_data$Sex == "female" & titanic_data$Pclass == "1" & titanic_data$Survived == "1" & titanic_data$SibSp == "0" & titanic_data$Parch == "0"]))
+```
+Observamos que hay una proporción similar de pasajeras con estas características que embarcaron en Cherbourg y en Southampton. Como no podemos inferir en qué puerto embarcaron nuestras pasajeras, eliminaremos los dos registros:
+
+```{r}
+titanic_data <- titanic_data[!is.na(titanic_data$Embarked),]
+```
+
+Comprobamos que no haya ningún valor vacío en el conjunto modificado:
+
+```{r}
+colSums(is.na(titanic_data))
+```
 
 ### 3.2 Identificación y tratamiento de valores extremos.
 
 Realizaremos un análisis de las variables numéricas continuas para detectar posibles valores extremos:
 
+##### Age
 ```{r}
 boxplot(titanic_data$Age)
 ```
 
+No se observa ningún valor atípico, todos los pasajeros tienen edades por debajo de 80 años.
+
+##### Fare
+
 ```{r}
-boxplot(titanic_data$Fare)
+ggplot(titanic_data, aes(x=Pclass, y=Fare)) + geom_boxplot()
 ```
+
+Observamos diferentes outliers en función de la clase. Vamos a estudiarlas por separado:
+
+- Primera clase
+```{r}
+first_class <- titanic_data[titanic_data$Pclass == "1" & titanic_data$Fare > 200,]
+first_class[order(first_class$Fare),]
+```
+
+- Segunda clase
+```{r}
+second_class <- titanic_data[titanic_data$Pclass == "2" & titanic_data$Fare > 50,]
+second_class[order(second_class$Fare),]
+```
+
+- Tercera clase
+```{r}
+third_class <- titanic_data[titanic_data$Pclass == "3" & titanic_data$Fare > 25,]
+third_class[order(third_class$Fare),]
+```
+
+En todas las clases observamos que los rangos de precios se corresponden con el mismo puerto de embarque. Como consecuencia de esta consistencia en los precios, entendemos que son correctos.
+
 
 Adicionalmente, analizaremos el histograma de las variables numéricas discretas para detectar posibles valores extremos:
 
+##### SibSp
 ```{r}
 hist(titanic_data$SibSp)
 ```
 
+Observamos que la mayoría de pasajeros viajan solos o con un número de acompañantes entre 1 y 4. Estudiaremos aquellos pasajeros que viajan con más acompañantes.
+
+```{r}
+companions <- titanic_data[titanic_data$SibSp > 4,]
+companions[order(third_class$SibSp),]
+```
+
+##### Parch
 ```{r}
 hist(titanic_data$Parch)
 ```
