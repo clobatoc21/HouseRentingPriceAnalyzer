@@ -56,22 +56,57 @@ Los datos analizados pretenden dar respuesta a varias preguntas; entre ellas:
 Como primer paso, antes de comenzar la limpieza, realizamos la carga del conjunto a estudiar:
 
 ```{r}
-titanic_data <-read.csv("./train_titanic.csv",header=T,sep=",")
+  titanic_data <-read.csv("./train_titanic.csv", header=T, sep=",", fileEncoding = "UTF-8", na.strings=c("NA", ""))
 ```
 
-Calcularemos ahora las dimensiones del conjunto:
+Calcularemos ahora las dimensiones del conjunto y analizaremos el tipo de variable correspondiente con cada columna:
 
 ```{r}
-dim(data)
+str(titanic_data)
 ```
 
-Observamos que el conjunto analizado se compone de 891 registros y 12 variables.
+Observamos que el fichero contiene 891 registros, correspondientes a las 12 variables descritas anteriormente (apartado 1):
 
-### 3.1 ¿Los datos contienen ceros o elementos vacíos? ¿Cómo gestionarías cada uno de estos casos?
+- Categóricas: Survived, Pclass, Sex, Embarked
+- Numéricas discretas: PassengerId, SibSp, ParCh
+- Numéricas continuas: Age, Fare
+- Texto: Name, Ticket, Cabin
+
+### 3.1 Elementos vacíos.
+
+Estudiaremos ahora si nuestros datos contienen elementos vacíos:
+
+```{r}
+colSums(is.na(titanic_data))
+```
+
+Observamos que tenemos elementos vacíos en las columnas "Age", "Cabin" y "Embarked":
+
+- Age: Nos faltan 177 datos de los 891 registros (19,9%). Realizaremos una regresión en base al resto de variables para asociar una edad.
+- Cabin: Nos faltan 687 datos de los 891 registros (77,1%). Eliminaremos la variable de nuestro conjunto, pues no aporta información para las preguntas planteadas y faltan demasiados datos.
+- Embarked: Nos faltan 2 datos de los 891 registros (0,2%). Evaluaremos si tiene sentido asumir que pertenecen a un determinado grupo (en función del resto de características); si no es posible categorizar a estos pasajeros, eliminaremos los registros.
 
 ### 3.2 Identificación y tratamiento de valores extremos.
 
+Realizaremos un análisis de las variables numéricas continuas para detectar posibles valores extremos:
 
+```{r}
+boxplot(titanic_data$Age)
+```
+
+```{r}
+boxplot(titanic_data$Fare)
+```
+
+Adicionalmente, analizaremos el histograma de las variables numéricas discretas para detectar posibles valores extremos:
+
+```{r}
+hist(titanic_data$SibSp)
+```
+
+```{r}
+hist(titanic_data$Parch)
+```
 
 ## 4. Análisis de los datos.
 
