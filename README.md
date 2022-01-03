@@ -1,16 +1,17 @@
-# HouseRentingPriceAnalyzer
-This analysis was performed as part of the subject "Tipología y ciclo de vida de los datos", which belongs to Data Science Master's program in Universitat Oberta de Catalunya. It uses the data obtained from IDEALISTA and WG-GESUCHT, two apartment hunting websites from Spain and Germany respectively.
+# TitanicSurvivalAnalyzer
+This analysis was performed as part of the subject "Tipología y ciclo de vida de los datos", which belongs to Data Science Master's program in Universitat Oberta de Catalunya. It uses the data provided by Kaggle on the survival of passengers in Titanic sinking.
 
 # Group members
 - Raúl Vicente Ferrer
 - Carmen Lobato Cassinello
 
 # Files
-**INCLUIR ARCHIVOS GENERADOS Y SU DESCRIPCIÓN**
-- HouseRentingSpainGermany.csv: it contains the original dataset, obtained from scraping the websites mentioned in the description.
+
+- train_titanic.csv: it contains data from passengers inside the Titanic ship when it sunk.
 
 # Libraries
-**INCLUIR LIBRERÍAS UTILIZADAS**
+- dplyr
+- ggplot2
 
 # Resources
 - Calvo M., Subirats L., Pérez D. (2019). Introducción a la limpieza y análisis de los datos. Editorial UOC.
