@@ -208,21 +208,80 @@ Adicionalmente, analizaremos el histograma de las variables numéricas discretas
 hist(titanic_data$SibSp)
 ```
 
-Observamos que la mayoría de pasajeros viajan solos o con un número de acompañantes entre 1 y 4. Estudiaremos aquellos pasajeros que viajan con más acompañantes.
+Observamos que la mayoría de pasajeros viajan solos o con un número de hermanos + pareja entre 1 y 4. Estudiaremos a los viajeros que viajan con más acompañantes.
 
 ```{r}
-companions <- titanic_data[titanic_data$SibSp > 4,]
-companions[order(third_class$SibSp),]
+titanic_data[titanic_data$SibSp > "4",]
 ```
+
+Observamos que hay cinco pasajeros que viajan con cinco acompañantes, todos embarcando desde el mismo puerto y con una tarifa similar. Entendemos que los datos son correctos.
+Adicionalmente, observamos que hay siete pasajeros que viajan con ocho acompañantes; de nuevo, todos desde el mismo puerto y con una tarifa similar, por lo que asumimos que los datos son correctos.
+
+Entendemos que los pasajeros restantes (uno para 5 acompañantes y dos para 8 acompañantes) están incluidos en el conjunto de test.
 
 ##### Parch
 ```{r}
 hist(titanic_data$Parch)
 ```
 
+Observamos, de nuevo, que la mayoría de pasajeros viaja solos o con un número de padres + hijos entre uno y dos. Estudiaremos aquellos que viajan con más acompañantes. 
+
+```{r}
+titanic_data[titanic_data$Parch > "2",]
+```
+
+Todas las edades son coherentes con tener por lo menos un hijo y/o viajar con padres (el varón de 16 estaría al límite, pero dada la época se entiende dentro del rango asumible). No se eliminará, por tanto, ningún registro.
+
 ## 4. Análisis de los datos.
 
+En este apartado dividiremos el conjunto de entrenamiento en varios grupos, los cuales nos ayudarán a responder las preguntas planteadas en el primer apartado.
+
 ### 4.1 Selección de los grupos de datos que se quieren analizar/comparar (planificación de los análisis a aplicar).
+
+Los grupos que utilizaremos para nuestro análisis son los siguientes:
+
+- Clase: analizaremos si la clase en la que viajaban los pasajeros influyó en su supervivencia.
+- Género: estudiaremos si el género de los pasajeros afectó a la supervivencia.
+- Rango de edad: estudiaremos si el rango de edad de los pasajeros tuvo algo que ver en su supervivencia. Dividiremos los datos en varios grupos en función del rango de edad.
+- Acompañantes: analizaremos si las personas que viajaban solas tuvieron mayor o menor tasa de supervivencia que las que viajaban con acompañantes. Para esto crearemos una nueva variable que combine "SibSp" y "Parch".
+- Puerto de embarque: estudiaremos si el puerto de embarque tuvo algún efecto en la supervivencia.
+
+**Clase**
+```{r}
+ggplot(titanic_data, aes(x=Pclass, fill=Survived)) + geom_bar()
+```
+
+Observamos una supervivencia claramente superior en pasajeros que viajaban en primera clase con respecto a aquellos que viajaban en tercera clase. Podemos concluir que la clase en la que los pasajeros viajaban fue determinante para su supervivencia.
+
+**Género**
+```{r}
+ggplot(titanic_data, aes(x=Sex, fill=Survived)) + geom_bar()
+```
+
+Observamos que las mujeres tuvieron un porcentaje de supervivencia significativamente superior al de los hombres, por lo que podemos concluir que esta variable es determinante para la supervivencia.
+
+**Rango de edad**
+```{r}
+titanic_data$AgeGroup <- cut(titanic_data$Age, breaks = c(0,15,25,55,75,100), labels = c("Children","Young","Adults","Retired","Elderly"))
+ggplot(titanic_data, aes(x=AgeGroup, fill=Survived)) + geom_bar()
+```
+
+Observamos que el porcentaje de supervivencia disminuye a medida que aumenta la edad, salvo en los muy ancianos (poca muestra, todos sobrevivieron). Esto encaja con la frase "Mujeres y niños primero", conocida por aplicarse en este incidente.
+El rango de edad fue, por tanto, determinante para la supervivencia.
+
+**Acompañantes**
+```{r}
+titanic_data$Companions <- titanic_data$SibSp + titanic_data$Parch
+ggplot(titanic_data, aes(x=Companions, fill=Survived)) + geom_bar()
+```
+No se observa una diferencia significativa en el porcentaje de supervivencia en función del número de acompañantes, por lo que entendemos que esta variable no fue relevante.
+
+**Puerto de embarque**
+```{r}
+ggplot(titanic_data, aes(x=Embarked, fill=Survived)) + geom_bar()
+```
+
+Observamos proporciones inferiores en la supervivencia de aquellos pasajeros embarcados en Southampton con respecto a los pasajeros embargados en los otros dos puertos. Queda por estudiar si la diferencia es significativa.
 
 ### 4.2 Comprobación de la normalidad y homogeneidad de la varianza.
 
