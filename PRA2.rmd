@@ -1,15 +1,18 @@
 ---
-title: 'Tipología y ciclo de vida de los datos'
-subtitle: 'PRÁCTICA 2: Limpieza y análisis de datos'
-author: "Autores: Raúl Vicente Ferrer y Carmen Lobato Cassinello"
+title: "Tipología y ciclo de vida de los datos"
+author: 'Autores: Raúl Vicente Ferrer y Carmen Lobato Cassinello'
 date: "Enero 2022"
 output:
+  html_document:
+    toc: yes
+    df_print: paged
   pdf_document:
     highlight: zenburn
     toc: yes
+subtitle: 'PRÁCTICA 2: Limpieza y análisis de datos'
 header-includes:
-  - \usepackage {hyperref}
-  - \hypersetup {colorlinks = true, linkcolor = blue, urlcolor = blue}
+- \usepackage {hyperref}
+- \hypersetup {colorlinks = true, linkcolor = blue, urlcolor = blue}
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -21,6 +24,16 @@ knitr::opts_chunk$set(echo = TRUE)
 if (!require('ggplot2')) install.packages('ggplot2'); library('ggplot2')
 # https://cran.r-project.org/web/packages/dplyr/index.html
 if (!require('dplyr')) install.packages('dplyr'); library('dplyr')
+# https://cran.r-project.org/web/packages/ggpubr/index.html
+if (!require('ggpubr')) install.packages('ggpubr'); library('ggpubr')
+# https://cran.r-project.org/web/packages/caTools/index.html
+if (!require('caTools')) install.packages('caTools'); library('caTools')
+# https://cran.r-project.org/web/packages/caret/index.html
+if (!require('caret')) install.packages('caret'); library('caret')
+# https://cran.r-project.org/web/packages/rpart/index.html
+if (!require('rpart')) install.packages('rpart'); library('rpart')
+# https://cran.r-project.org/web/packages/rpart.plot/index.html
+if (!require('rpart.plot')) install.packages('rpart.plot'); library('rpart.plot')
 ```
 
 ## 1. Descripción del dataset.
@@ -384,7 +397,7 @@ Dado que p-value es inferior al nivel de significancia (< 0,05), se rechaza la h
 fligner.test(SibSp ~ Survived, data = titanic_data)
 ```
 
-Dado que p-value es superior al nivel de significancia (< 0,05), se acepta la hipótesis nula de homocedasticidad y se concluye que la variable SibSp no presenta varianzas estadísticamente diferentes para los diferentes grupos de Survived.
+Dado que p-value es superior al nivel de significancia (> 0,05), se acepta la hipótesis nula de homocedasticidad y se concluye que la variable SibSp no presenta varianzas estadísticamente diferentes para los diferentes grupos de Survived.
 
 * Parch:
 
@@ -549,7 +562,7 @@ Dado que p-value es inferior al nivel de significancia (< 0,05), se rechaza la h
 
 A lo largo del estudio anterior, hemos encontrado una relación significativa entre la supervivencia de los viajeros y su género, edad y clase:
 
-```{r}
+```{r warning=FALSE}
 ggarrange(gender, agegroup, class, labels = c("G", "A", "C"), ncol = 2, nrow = 2)
 
 Category <- c("Pclass", "Agegroup","Sex")
@@ -575,9 +588,95 @@ anova(rm_companions, test="Chisq")
 
 ## 6. Resolución del problema. A partir de los resultados obtenidos, ¿cuáles son las conclusiones? ¿Los resultados permiten responder al problema?
 
+Para ser capaces de predecir la probabilidad de sobrevivir de un pasajero vamos a elaborar diferentes modelos predicción y a valorar su calidad.
+
+Antes de nada creamos dividimos el dataset en train y test
+
+```{r}
+set.seed(123)
+split = sample.split(titanic_data$Survived, SplitRatio = 0.80)
+titanic_train = subset(titanic_data, split == TRUE)
+titanic_test = subset(titanic_data, split == FALSE)
+
+str(titanic_train)
+str(titanic_test)
+```
 
 
-## 7. Código.
+* Regresión logística: variable dependiente Survived y variable explicativa Pclass
+
+```{r}
+logit_model_1 <- glm( formula = Survived ~ Pclass, data = titanic_train, family = binomial)
+summary(logit_model_1)
+```
+
+* Regresión logística: variable dependiente Survived y variables explicativas Pclass y Sex
+
+```{r}
+logit_model_2 <- glm( formula = Survived ~ Pclass + Sex, data = titanic_train, family = binomial)
+summary(logit_model_2)
+```
+
+* Regresión logística: variable dependiente Survived y variables explicativas Pclass, Sex y Age
+
+```{r}
+logit_model_3 <- glm( formula = Survived ~ Pclass + Sex + Age, data = titanic_train, family = binomial)
+summary(logit_model_3)
+```
+
+* Regresión logística: variable dependiente Survived y variables explicativas Pclass, Sex, Age y Embarked
+
+```{r}
+logit_model_4 <- glm(formula=Survived ~ Pclass + Sex + Age + Embarked, data = titanic_train, family = binomial)
+summary(logit_model_4)
+```
+
+Observando el AIC de cada modelo, se ve que cada variable que se añade mejora el modelo, aunque hay que destacar que la mejora provocada por Embarked es casi imperceptible, por lo que nos quedamos con el modelo sin esta variable.
+
+Estudiemos la bondad de nuestro modelo:
+
+```{r}
+titanic_test$Survived_predict_regression = round(predict.glm(logit_model_3, titanic_test, type = 'response'))
+
+confusionMatrix(as.factor(titanic_test$Survived), as.factor(titanic_test$Survived_predict_regression))
+```
+
+Obtenemos una precisión en la predicción del 80.34%
+
+* Vamos a entrenar un árbol de decisión y lo compararemos con el modelo de regresión logística multivariable anterior:
+
+
+```{r}
+tree_model <- rpart(Survived ~ Pclass + Sex + Age, data = titanic_train, method = "class")
+rpart.plot(tree_model)
+```
+
+Evaluamos su precisión:
+
+```{r}
+predict_tree <- predict(tree_model, newdata = titanic_test[-1], type="class")
+titanic_test$Survived_predict_tree = predict(tree_model, newdata = titanic_test[-1], type="class")
+
+confusionMatrix(titanic_test$Survived, as.factor(titanic_test$Survived_predict_tree))
+```
+
+Obtenemos una precisión en la predicción del 83.15%, por lo que es más preciso el árbol de decisión que la regresión logística.
+
+## 7. Aplicación del mejor modelo al dataset de test para concurso.
+
+```{r}
+titanic_data_test <- read.csv("./test_titanic.csv", header=T, sep=",", stringsAsFactors = FALSE, fileEncoding = "UTF-8", na.strings=c("NA", ""))
+titanic_data_test$Pclass <- as.factor(titanic_data_test$Pclass)
+titanic_data_test$Sex <- as.factor(titanic_data_test$Sex)
+
+predict_tree <- predict(tree_model, newdata = titanic_data_test[-1], type="class")
+titanic_data_test$Survived = predict(tree_model, newdata = titanic_data_test[-1], type="class")
+titanic_data_test <- titanic_data_test[,-(2:11),drop=FALSE]
+
+write.csv(titanic_data_test, "test_titanic_survived.csv")
+```
+
+## 8. Código.
 
 El código utilizado para el análisis de la información se puede encontrar en la siguiente [URL](https://github.com/clobatoc21/TitanicSurvivalAnalyzer).
 
