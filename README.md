@@ -11,6 +11,7 @@ This analysis was performed as part of the subject "Tipología y ciclo de vida d
 
 # Libraries
 - dplyr
+- plyr
 - ggplot2
 
 # Resources
