@@ -7,8 +7,10 @@ This analysis was performed as part of the subject "Tipología y ciclo de vida d
 
 # Files
 
-- train_titanic.csv: it contains data from passengers inside the Titanic ship when it sunk. Includes information regarding the survival, used to train the model.
+- train_titanic_og.csv: it contains data from passengers inside the Titanic ship when it sunk. Before fixes, includes information regarding the survival, used to train the model.
+- train_titanic.csv: it contains data from passengers inside the Titanic ship when it sunk. Used for analysis, includes information regarding the survival, used to train the model.
 - test_titanic.csv: it contains data from passengers inside the Titanic ship when it sunk. Does not include information regarding the survival, which will be predicted as part of the exercise.
+- 
 
 # Libraries
 - dplyr
