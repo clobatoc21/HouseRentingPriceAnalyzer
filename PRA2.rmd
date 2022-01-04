@@ -476,15 +476,50 @@ Dado que p-value es inferior al nivel de significancia (< 0,05), se rechaza la h
 
 2. ¿Cuántas personas viajaban solas? ¿Y con familia? ¿Cómo se relaciona esto con la tasa de supervivencia?
 
+Calculamos primero cuántas personas viajaban solas y cuántas con familia:
 ```{r}
+length(titanic_data$Companions[titanic_data$Companions == 0]) # Viajan solos
 
+length(titanic_data$Companions[titanic_data$Companions > 0]) # Viajan acompañados
 ```
+
+Observamos que 535 pasajeros viajaban solos, mientras que 354 viajaban acompañados.
+
+Para dar respuesta a la siguiente pregunta emplearemos un análisis regresión logística entre Companions y Survived:
+
+```{r}
+rm_companions <- glm(Survived ~ Companions, family = binomial(link='logit'), data = titanic_data)
+summary(rm_companions)
+```
+
+Observamos que nuestra variable no es estadísticamente significativa (p-value superior a 0,05). 
+
+Ejecutamos el test de ANOVA para confirmar que la diferencia entre el modelo con y sin la variable no es significativa:
+
+```{r}
+anova(rm_companions, test="Chisq")
+```
+
+Observamos que la desviación de residuales es prácticamente la misma sin la variable (NULL, 1182.8) que con la variable (1182.5). Concluimos así que la variable Survived no depende de la variable Companions, es decir, la supervivencia del pasajero no depende del número de personas que lo acompañan.
 
 3. ¿Tiene algo que ver el puerto de embarque con la tasa de supervivencia?
 
-```{r}
+Para dar respuesta a esta pregunta emplearemos, de nuevo, un análisis regresión logística:
 
+```{r}
+rm_embarked <- glm(Survived ~ Embarked, family = binomial(link='logit'), data = titanic_data)
+summary(rm_embarked)
 ```
+
+Observamos que embarcar en los puertos de Queenston o Southampton tiene una relación significativamente negativa con la supervivencia )p-value inferior a 0,05). 
+
+Ejecutamos el test de ANOVA para confirmar que la diferencia entre el modelo con y sin la variable es significativa:
+
+```{r}
+anova(rm_embarked, test="Chisq")
+```
+
+La desviación de residuales varía considerablemente al añadir la variable Embarked con respecto a la observada sin la variable (1157 frente a 1182.8). Concluimos así que la variable Survived depende de la variable Embarked, es decir, la supervivencia del pasajero depende del puerto en el que embarcó.
 
 ## 5. Representación de los resultados a partir de tablas y gráficas.
 
