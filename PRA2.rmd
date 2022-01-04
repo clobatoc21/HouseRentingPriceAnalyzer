@@ -248,40 +248,46 @@ Los grupos que utilizaremos para nuestro análisis son los siguientes:
 
 **Clase**
 ```{r}
-ggplot(titanic_data, aes(x=Pclass, fill=Survived)) + geom_bar() 
+class <- ggplot(titanic_data, aes(x=Pclass, fill=Survived)) + geom_bar()
+class
 ```
 
-Observamos una supervivencia claramente superior en pasajeros que viajaban en primera clase con respecto a aquellos que viajaban en tercera clase. Podemos concluir que la clase en la que los pasajeros viajaban fue determinante para su supervivencia.
+Observamos una supervivencia claramente superior en pasajeros que viajaban en primera clase con respecto a aquellos que viajaban en tercera clase. Parece que la clase en la que los pasajeros viajaban fue determinante para su supervivencia.
 
 **Género**
 ```{r}
-ggplot(titanic_data, aes(x=Sex, fill=Survived)) + geom_bar()
+gender <- ggplot(titanic_data, aes(x=Sex, fill=Survived)) + geom_bar()
+gender
 ```
 
-Observamos que las mujeres tuvieron un porcentaje de supervivencia significativamente superior al de los hombres, por lo que podemos concluir que esta variable es determinante para la supervivencia.
+Observamos que las mujeres tuvieron un porcentaje de supervivencia significativamente superior al de los hombres. Parece que esta variable fue determinante para la supervivencia de los pasajeros.
 
 **Rango de edad**
 ```{r}
 titanic_data$AgeGroup <- cut(titanic_data$Age, breaks = c(0,15,25,55,75,100), labels = c("Children","Young","Adults","Retired","Elderly"))
-ggplot(titanic_data, aes(x=AgeGroup, fill=Survived)) + geom_bar()
+agegroup <- ggplot(titanic_data, aes(x=AgeGroup, fill=Survived)) + geom_bar()
+agegroup
 ```
 
 Observamos que el porcentaje de supervivencia disminuye a medida que aumenta la edad, salvo en los muy ancianos (poca muestra, todos sobrevivieron). Esto encaja con la frase "Mujeres y niños primero", conocida por aplicarse en este incidente.
-El rango de edad fue, por tanto, determinante para la supervivencia.
+El rango de edad parece ser, por tanto, determinante para la supervivencia.
 
 **Acompañantes**
 ```{r}
 titanic_data$Companions <- titanic_data$SibSp + titanic_data$Parch
-ggplot(titanic_data, aes(x=Companions, fill=Survived)) + geom_bar()
+companions <- ggplot(titanic_data, aes(x=Companions, fill=Survived)) + geom_bar()
+companions
 ```
-No se observa una diferencia significativa en el porcentaje de supervivencia en función del número de acompañantes, por lo que entendemos que esta variable no fue relevante.
+
+No se observa una diferencia significativa en el porcentaje de supervivencia en función del número de acompañantes, por lo que parece que esta variable no fue relevante.
 
 **Puerto de embarque**
 ```{r}
-ggplot(titanic_data, aes(x=Embarked, fill=Survived)) + geom_bar()
+port <- ggplot(titanic_data, aes(x=Embarked, fill=Survived)) + geom_bar()
+port
 ```
 
-Observamos proporciones inferiores en la supervivencia de aquellos pasajeros embarcados en Southampton con respecto a los pasajeros embarcados en los otros dos puertos. Queda por estudiar si la diferencia es significativa.
+Observamos proporciones inferiores en la supervivencia de aquellos pasajeros embarcados en Southampton con respecto a los pasajeros embarcados en los otros dos puertos. Queda por estudiar si la diferencia se debe al efecto de alguna otra variable.
 
 ### 4.2 Comprobación de la normalidad y homogeneidad de la varianza.
 
@@ -339,7 +345,7 @@ Para salir de dudas, aplicamos el Test Shapiro-Wilk:
 shapiro.test(titanic_data$Age)
 ```
 
-La probabilidad, p-value, es menor que el valor de significación, 0.05, por lo que se acepta la hipótesis nula del test y se puede afirmar que la variable Age no sigue una distribución normal
+La probabilidad, p-value, es menor que el valor de significación, 0.05, por lo que se acepta la hipótesis nula del test y se puede afirmar que la variable Age no sigue una distribución normal.
 
 * SibSp:
 
@@ -511,7 +517,7 @@ rm_embarked <- glm(Survived ~ Embarked, family = binomial(link='logit'), data = 
 summary(rm_embarked)
 ```
 
-Observamos que embarcar en los puertos de Queenston o Southampton tiene una relación significativamente negativa con la supervivencia )p-value inferior a 0,05). 
+Observamos que embarcar en los puertos de Queenston o Southampton tiene una relación significativamente negativa con la supervivencia (p-value inferior a 0,05). Esto puede deberse a que un porcentaje mayor de pasajeros de tercera clase embarcara en estos puertos.
 
 Ejecutamos el test de ANOVA para confirmar que la diferencia entre el modelo con y sin la variable es significativa:
 
@@ -521,9 +527,51 @@ anova(rm_embarked, test="Chisq")
 
 La desviación de residuales varía considerablemente al añadir la variable Embarked con respecto a la observada sin la variable (1157 frente a 1182.8). Concluimos así que la variable Survived depende de la variable Embarked, es decir, la supervivencia del pasajero depende del puerto en el que embarcó.
 
+Analizamos la relación entre el puerto de embarque y la clase para ver si había un porcentaje mayor de pasajeros de tercera clase en Queenston o Southampton con respecto a Cherbourg:
+
+```{r}
+ggplot(titanic_data, aes(x=Embarked, fill=Pclass)) + geom_bar()
+
+port_class <- table(titanic_data$Embarked, titanic_data$Pclass)
+```
+
+Observamos que el porcentaje de viajeros de primera clase (mayor supervivencia) es de un 50,6% en Cherbourg, mientras que solo representan el 2,6% en Queenston y el 19,7% en Southampton. Con respecto a la tercera clase (menor supervivencia), observamos que representan un 39,3% en Cherbourg, un 93,5% en Queenston y un 54,8% en Southampton.
+
+Parece haber una relación de dependencia entre el puerto de embarque y la clase de los pasajeros. Para confirmarla, aplicamos el test Chi-square sobre la tabla de contingencia:
+
+```{r}
+chisq.test(port_class)
+```
+
+Dado que p-value es inferior al nivel de significancia (< 0,05), se rechaza la hipótesis nula de independencia y se concluye que la variable Embarked depende de la variable Pclass, es decir, el puerto de embarque depende de la clase del pasajero.
+
 ## 5. Representación de los resultados a partir de tablas y gráficas.
 
+A lo largo del estudio anterior, hemos encontrado una relación significativa entre la supervivencia de los viajeros y su género, edad y clase:
 
+```{r}
+ggarrange(gender, agegroup, class, labels = c("G", "A", "C"), ncol = 2, nrow = 2)
+
+Category <- c("Pclass", "Agegroup","Sex")
+Chisq <- c(chisq.test(tabla1)$statistic, chisq.test(tabla2)$statistic, chisq.test(tabla3)$statistic)
+Pvalue <- c(chisq.test(tabla1)$p.value, chisq.test(tabla2)$p.value, chisq.test(tabla3)$p.value)
+
+data.frame(Category, Chisq, Pvalue)
+```
+
+Adicionalmente, hemos concluido que el puerto de embarque de los pasajeros guarda relación con la clase en la que viajaban, lo que justifica la relación encontrada entre el puerto de embarque y la supervivencia:
+```{r}
+port
+
+chisq.test(port_class)
+```
+
+Finalmente, hemos concluido que el número de acompañantes no guarda relación con las probabilidades de supervivencia de los pasajeros a nivel individual:
+```{r}
+companions
+
+anova(rm_companions, test="Chisq")
+```
 
 ## 6. Resolución del problema. A partir de los resultados obtenidos, ¿cuáles son las conclusiones? ¿Los resultados permiten responder al problema?
 
