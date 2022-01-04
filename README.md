@@ -7,13 +7,20 @@ This analysis was performed as part of the subject "Tipología y ciclo de vida d
 
 # Files
 
-- train_titanic.csv: it contains data from passengers inside the Titanic ship when it sunk.
+- train_titanic_og.csv: it contains data from passengers inside the Titanic ship when it sunk. Before fixes, includes information regarding the survival, used to train the model.
+- train_titanic.csv: it contains data from passengers inside the Titanic ship when it sunk. Used for analysis, includes information regarding the survival, used to train the model.
+- test_titanic.csv: it contains data from passengers inside the Titanic ship when it sunk. Does not include information regarding the survival, which will be predicted as part of the exercise.
+- test_titanic_survived.csv: final file generated for contest. It includes predictions of survival on test file.
 
 # Libraries
 - dplyr
 - plyr
 - ggplot2
 - ggpubr
+- caTools
+- caret
+- rpart
+- rpart.plot
 
 # Resources
 - Calvo M., Subirats L., Pérez D. (2019). Introducción a la limpieza y análisis de los datos. Editorial UOC.
