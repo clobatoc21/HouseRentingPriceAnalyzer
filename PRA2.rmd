@@ -18,6 +18,7 @@ header-includes:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+\pagebreak
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 # https://cran.r-project.org/web/packages/ggplot2/index.html
@@ -42,17 +43,17 @@ if (!require('rpart.plot')) install.packages('rpart.plot'); library('rpart.plot'
 
 Para la realización de esta práctica se ha utilizado el conjunto de entrenamiento de *Titanic: Machine Learning from Disaster* (kaggle), el cual se puede encontrar en la siguiente [URL](https://www.kaggle.com/c/titanic/data). Se ha renombrado como "train_titanic.csv".
 
-El conjunto de datos recoge información sobre los pasajeros a borde del Titanic cuando el buque chocó contra el iceberg:
+El conjunto de datos recoge información sobre los pasajeros a bordo del Titanic cuando el buque chocó contra el iceberg:
 
 * PassengerId: contiene el identificador numérico del pasajero.
 * Survived [0, 1]: describe si el pasajero sobrevivió o no al hundimiento del buque.
-* Pclass [1, 2, 3]: descibe la clase en la que viajaba el pasajero.
+* Pclass [1, 2, 3]: describe la clase en la que viajaba el pasajero.
 * Name: describe el nombre completo del pasajero.
 * Sex [male, female]: describe el género del pasajero.
-* Age: descibe la edad del pasajero en años.
+* Age: describe la edad del pasajero en años.
 * SibSp: describe el número de hermanos/as o esposos/as del pasajero a bordo del buque.
 * ParCh: descibe el número de padres o hijos del pasajero a bordo del buque.
-* Ticket: descibe el número de billete del pasajero.
+* Ticket: describe el número de billete del pasajero.
 * Fare: describe el precio del billete que llevaba el pasajero.
 * Cabin: describe la cabina en la que viajaba el pasajero.
 * Embarked [C, Q, S]: describe el puerto de embarque del pasajero.
@@ -129,7 +130,7 @@ Observamos que tenemos elementos vacíos en las columnas "Age" y "Embarked":
 
 ##### Age
 
-Como primer paso para realizar nuestra inferencia, seleccionamos las variables que resultan de interés a la hora de predecir la edad de los pasajeros: su género, la clase en la que viajaba, y la supervivencia al hundimiento.
+Como primer paso para realizar nuestra inferencia, seleccionamos las variables que resultan de interés a la hora de predecir la edad de los pasajeros: su género, la clase en la que viajaban, y la supervivencia al hundimiento.
 Agrupamos los datos por Sex, Pclass y Survived y calculamos la mediana para cada grupo (esta medida es más resistente a outliers que la media):
 
 ```{r}
@@ -217,6 +218,7 @@ En todas las clases observamos que los rangos de precios se corresponden con el 
 Adicionalmente, analizaremos el histograma de las variables numéricas discretas para detectar posibles valores extremos:
 
 ##### SibSp
+
 ```{r}
 hist(titanic_data$SibSp)
 ```
@@ -233,6 +235,7 @@ Adicionalmente, observamos que hay siete pasajeros que viajan con ocho acompaña
 Entendemos que los pasajeros restantes (uno para 5 acompañantes y dos para 8 acompañantes) están incluidos en el conjunto de test.
 
 ##### Parch
+
 ```{r}
 hist(titanic_data$Parch)
 ```
@@ -319,7 +322,7 @@ qqnorm(titanic_data$Fare, main = "Fare", xlab = "Cuantiles teóricos", ylab = "C
 qqline(titanic_data$Fare)
 ```
 
-La variable Age se aproxima ligeramente a una distribución normal, pero el resto de variables no. 
+La variable Age parece aproximarse ligeramente a una distribución normal, pero el resto de variables no. 
 
 Visualicemos con histogramas de densidad y una curva de distribución normal superpuesta para confirmar:
 
@@ -358,7 +361,7 @@ Para salir de dudas, aplicamos el Test Shapiro-Wilk:
 shapiro.test(titanic_data$Age)
 ```
 
-La probabilidad, p-value, es menor que el valor de significación, 0.05, por lo que se acepta la hipótesis nula del test y se puede afirmar que la variable Age no sigue una distribución normal.
+La probabilidad, p-value, es menor que el valor de significación, 0.05, por lo que se acepta la hipótesis nula del test y se puede afirmar (al contrario de lo que parecían indicar las gráficas) que la variable Age no sigue una distribución normal.
 
 * SibSp:
 
@@ -421,7 +424,7 @@ Teniendo en cuenta las preguntas que se han planteado inicialmente:
 
 1. ¿Cómo se relacionan la clase, el género y la edad con la tasa de supervivencia?
 
-Para dar respuesta empleamos contrastes de hipótesis entre Pclass, Sex, AgeGroup y Survived: 
+Para dar respuesta a esta pregunta empleamos contrastes de hipótesis entre Pclass, Sex, AgeGroup y Survived: 
 
 **Contraste de hipótesis entre Pclass y Survived**
 
@@ -546,6 +549,7 @@ Analizamos la relación entre el puerto de embarque y la clase para ver si habí
 ggplot(titanic_data, aes(x=Embarked, fill=Pclass)) + geom_bar()
 
 port_class <- table(titanic_data$Embarked, titanic_data$Pclass)
+port_class
 ```
 
 Observamos que el porcentaje de viajeros de primera clase (mayor supervivencia) es de un 50,6% en Cherbourg, mientras que solo representan el 2,6% en Queenston y el 19,7% en Southampton. Con respecto a la tercera clase (menor supervivencia), observamos que representan un 39,3% en Cherbourg, un 93,5% en Queenston y un 54,8% en Southampton.
@@ -572,12 +576,16 @@ Pvalue <- c(chisq.test(tabla1)$p.value, chisq.test(tabla2)$p.value, chisq.test(t
 data.frame(Category, Chisq, Pvalue)
 ```
 
+Observamos que las mujeres tuvieron una tasa de supervivencia mayor a los hombres, los jóvenes mayor a los adultos y los pasajeros de primera clase mayor a los que viajaban en segunda o tercera clase.
+
+
 Adicionalmente, hemos concluido que el puerto de embarque de los pasajeros guarda relación con la clase en la que viajaban, lo que justifica la relación encontrada entre el puerto de embarque y la supervivencia:
 ```{r}
 port
 
 chisq.test(port_class)
 ```
+
 
 Finalmente, hemos concluido que el número de acompañantes no guarda relación con las probabilidades de supervivencia de los pasajeros a nivel individual:
 ```{r}
@@ -632,6 +640,9 @@ summary(logit_model_4)
 ```
 
 Observando el AIC de cada modelo, se ve que cada variable que se añade mejora el modelo, aunque hay que destacar que la mejora provocada por Embarked es casi imperceptible, por lo que nos quedamos con el modelo sin esta variable.
+
+Los resultados obtenidos permiten responder al problema planteado: la supervivencia de los pasajeros dependía de su género, edad y clase.
+
 
 Estudiemos la bondad de nuestro modelo:
 
