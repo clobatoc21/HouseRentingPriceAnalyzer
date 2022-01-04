@@ -6,9 +6,13 @@ output:
   html_document:
     toc: yes
     df_print: paged
+    fig_width: 4
+    fig_height: 4
   pdf_document:
     highlight: zenburn
     toc: yes
+    fig_width: 4
+    fig_height: 4
 subtitle: 'PRÁCTICA 2: Limpieza y análisis de datos'
 header-includes:
 - \usepackage {hyperref}
@@ -41,7 +45,7 @@ if (!require('rpart.plot')) install.packages('rpart.plot'); library('rpart.plot'
 
 **¿Qué conjunto de datos se ha utilizado?**
 
-Para la realización de esta práctica se ha utilizado el conjunto de entrenamiento de *Titanic: Machine Learning from Disaster* (kaggle), el cual se puede encontrar en la siguiente [URL](https://www.kaggle.com/c/titanic/data). Se ha renombrado como "train_titanic.csv".
+Para la realización de esta práctica se ha utilizado el conjunto de entrenamiento de *Titanic: Machine Learning from Disaster* (kaggle), el cual se puede encontrar en la siguiente [URL](https://www.kaggle.com/c/titanic/data). Se ha renombrado como "train_titanic_og.csv".
 
 El conjunto de datos recoge información sobre los pasajeros a bordo del Titanic cuando el buque chocó contra el iceberg:
 
@@ -77,7 +81,7 @@ Los datos analizados pretenden dar respuesta a varias preguntas; entre ellas:
 Como primer paso, realizamos la carga del conjunto a estudiar:
 
 ```{r}
-titanic_data <- read.csv("./train_titanic.csv", header=T, sep=",", stringsAsFactors = FALSE, fileEncoding = "UTF-8", na.strings=c("NA", ""))
+titanic_data <- read.csv("./train_titanic_og.csv", header=T, sep=",", stringsAsFactors = FALSE, fileEncoding = "UTF-8", na.strings=c("NA", ""))
 ```
 
 Calcularemos ahora las dimensiones del conjunto y analizaremos el tipo de variable correspondiente con cada columna:
@@ -247,6 +251,12 @@ titanic_data[titanic_data$Parch > "2",]
 ```
 
 Todas las edades son coherentes con tener por lo menos un hijo y/o viajar con padres (el varón de 16 estaría al límite, pero dada la época se entiende dentro del rango asumible). No se eliminará, por tanto, ningún registro.
+
+Exportamos el archivo final a csv:
+
+```{r}
+write.csv(titanic_data,"./train_titanic.csv", row.names = FALSE)
+```
 
 ## 4. Análisis de los datos.
 
