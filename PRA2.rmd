@@ -53,10 +53,10 @@ Los datos del dataset son de tipo carácter o numérico, quedando excluidos otro
 El conjunto tratado resulta relevante porque nos ayuda a comprender mejor el funcionamiento de la sociedad en 1912, permitiéndonos analizar la evolución hasta la época actual y encontrar potenciales puntos de mejora.
 
 Los datos analizados pretenden dar respuesta a varias preguntas; entre ellas:
+
 1. ¿Cómo se relacionan la clase, el género y la edad con la tasa de supervivencia?
 2. ¿Cuántas personas viajaban solas? ¿Y con familia? ¿Cómo se relaciona esto con la tasa de supervivencia?
 3. ¿Tiene algo que ver el puerto de embarque con la tasa de supervivencia?
-
 
 ## 2. Integración y selección de los datos de interés a analizar.
 
@@ -248,7 +248,7 @@ Los grupos que utilizaremos para nuestro análisis son los siguientes:
 
 **Clase**
 ```{r}
-ggplot(titanic_data, aes(x=Pclass, fill=Survived)) + geom_bar()
+ggplot(titanic_data, aes(x=Pclass, fill=Survived)) + geom_bar() 
 ```
 
 Observamos una supervivencia claramente superior en pasajeros que viajaban en primera clase con respecto a aquellos que viajaban en tercera clase. Podemos concluir que la clase en la que los pasajeros viajaban fue determinante para su supervivencia.
@@ -281,12 +281,210 @@ No se observa una diferencia significativa en el porcentaje de supervivencia en 
 ggplot(titanic_data, aes(x=Embarked, fill=Survived)) + geom_bar()
 ```
 
-Observamos proporciones inferiores en la supervivencia de aquellos pasajeros embarcados en Southampton con respecto a los pasajeros embargados en los otros dos puertos. Queda por estudiar si la diferencia es significativa.
+Observamos proporciones inferiores en la supervivencia de aquellos pasajeros embarcados en Southampton con respecto a los pasajeros embarcados en los otros dos puertos. Queda por estudiar si la diferencia es significativa.
 
 ### 4.2 Comprobación de la normalidad y homogeneidad de la varianza.
 
+Para comprobar la normalidad de las variables numéricas (Age, SibSp, Parch, y Fare) primero lo haremos de forma visual mediante gráficos Q-Q normal:
+
+```{r}
+Conf2x2 = matrix(c(1:4), nrow=2, byrow=FALSE)
+layout(Conf2x2)
+qqnorm(titanic_data$Age, main = "Age", xlab = "Cuantiles teóricos", ylab = "Cuantiles muestrales")
+qqline(titanic_data$Age)
+qqnorm(titanic_data$SibSp, main = "SibSp", xlab = "Cuantiles teóricos", ylab = "Cuantiles muestrales")
+qqline(titanic_data$SibSp)
+qqnorm(titanic_data$Parch, main = "Parch", xlab = "Cuantiles teóricos", ylab = "Cuantiles muestrales")
+qqline(titanic_data$Parch)
+qqnorm(titanic_data$Fare, main = "Fare", xlab = "Cuantiles teóricos", ylab = "Cuantiles muestrales")
+qqline(titanic_data$Fare)
+```
+
+La variable Age se aproxima ligeramente a una distribución normal, pero el resto de variables no. 
+
+Visualicemos con histogramas de densidad y una curva de distribución normal superpuesta para confirmar:
+
+```{r}
+Conf2x2 = matrix(c(1:4), nrow=2, byrow=FALSE)
+layout(Conf2x2)
+
+hist(titanic_data$Age, probability = TRUE, main = "Age", xlab = "Población", ylab = "Densidad",  breaks=20)
+x   <- seq(min(titanic_data$Age), max(titanic_data$Age), length = 1000)
+y <- dnorm(x, mean(titanic_data$Age), sd(titanic_data$Age))
+lines(x, y, col = "blue")
+
+hist(titanic_data$SibSp, probability = TRUE, main = "SibSp", xlab = "Población", ylab = "Densidad",  breaks=20)
+x   <- seq(min(titanic_data$SibSp), max(titanic_data$SibSp), length = 1000)
+y <- dnorm(x, mean(titanic_data$SibSp), sd(titanic_data$SibSp))
+lines(x, y, col = "blue")
+
+hist(titanic_data$Parch, probability = TRUE, main = "Parch", xlab = "Población", ylab = "Densidad",  breaks=20)
+x   <- seq(min(titanic_data$Parch), max(titanic_data$Parch), length = 1000)
+y <- dnorm(x, mean(titanic_data$Parch), sd(titanic_data$Parch))
+lines(x, y, col = "blue")
+
+hist(titanic_data$Fare, probability = TRUE, main = "Fare", xlab = "Población", ylab = "Densidad",  breaks=20)
+x   <- seq(min(titanic_data$Fare), max(titanic_data$Fare), length = 1000)
+y <- dnorm(x, mean(titanic_data$Fare), sd(titanic_data$Fare))
+lines(x, y, col = "blue")
+```
+
+Observando los histogramas se puede confirmar lo observado en los diagramas Q-Q, la variable Age se aproxima ligeramente a una normal, pero SibSp, Parch y Fare presentan un sesgo hacia la izquierda.
+
+Para salir de dudas, aplicamos el Test Shapiro-Wilk:
+
+* Age:
+
+```{r}
+shapiro.test(titanic_data$Age)
+```
+
+La probabilidad, p-value, es menor que el valor de significación, 0.05, por lo que se acepta la hipótesis nula del test y se puede afirmar que la variable Age no sigue una distribución normal
+
+* SibSp:
+
+```{r}
+shapiro.test(titanic_data$SibSp)
+```
+
+* Parch:
+
+```{r}
+shapiro.test(titanic_data$Parch)
+```
+
+* Fare:
+
+```{r}
+shapiro.test(titanic_data$Fare)
+```
+
+Con el mismo razonamiento que para la variable Age, confirmamos que SibSp, Parch y Fare tampoco siguen una distribución normal.
+
+Para el estudio de la homocedasticidad usamos el test de Fligner-Killeen, que se trata de la alternativa no paramétrica,
+utilizada cuando los datos no cumplen con la condición de normalidad. Comprobamos si la varianza es significativamente distinta a la de Survived, con un nivel de significación del 5%.
+
+* Age:
+
+```{r}
+fligner.test(Age ~ Survived, data = titanic_data)
+```
+
+Dado que p-value es inferior al nivel de significancia (< 0,05), se rechaza la hipótesis nula de homocedasticidad y se concluye que la variable Age presenta varianzas estadísticamente diferentes para los diferentes grupos de Survived.
+
+* SibSp:
+
+```{r}
+fligner.test(SibSp ~ Survived, data = titanic_data)
+```
+
+Dado que p-value es superior al nivel de significancia (< 0,05), se acepta la hipótesis nula de homocedasticidad y se concluye que la variable SibSp no presenta varianzas estadísticamente diferentes para los diferentes grupos de Survived.
+
+* Parch:
+
+```{r}
+fligner.test(Parch ~ Survived, data = titanic_data)
+```
+
+Dado que p-value es inferior al nivel de significancia (< 0,05), se rechaza la hipótesis nula de homocedasticidad y se concluye que la variable Parch presenta varianzas estadísticamente diferentes para los diferentes grupos de Survived.
+
+* Fare:
+
+```{r}
+fligner.test(Fare ~ Survived, data = titanic_data)
+```
+
+Dado que p-value es inferior al nivel de significancia (< 0,05), se rechaza la hipótesis nula de homocedasticidad y se concluye que la variable Fare presenta varianzas estadísticamente diferentes para los diferentes grupos de Survived.
+
 ### 4.3 Aplicación de pruebas estadísticas para comparar los grupos de datos. En función de los datos y el objetivo del estudio, aplicar pruebas de contraste de hipótesis, correlaciones, regresiones, etc. Aplicar al menos tres métodos de análisis diferentes.
 
+Teniendo en cuenta las preguntas que se han planteado inicialmente:
+
+1. ¿Cómo se relacionan la clase, el género y la edad con la tasa de supervivencia?
+
+Para dar respuesta empleamos contrastes de hipótesis entre Pclass, Sex, AgeGroup y Survived: 
+
+**Contraste de hipótesis entre Pclass y Survived**
+
+Emplearemos el test Chi-square, con las siguientes hipótesis: 
+
+* Hipótesis nula: las variables son independientes.
+* Hipótesis alternativa: las variables son dependientes.
+
+Para comprobar la dependencia entre dos variables categóricas, se aplica el test chi-cuadrado. Pero antes es necesario crear la tabla de contingencia:
+
+```{r}
+tabla1 <- table(titanic_data$Survived, titanic_data$Pclass)
+tabla1
+plot(tabla1, col = c("red", "blue"), main = "Survived vs. Pclass")
+```
+
+A continuación se aplica el test chi-square sobre la tabla de contingencia:
+
+```{r}
+chisq.test(tabla1)
+```
+
+Dado que p-value es inferior al nivel de significancia (< 0,05), se rechaza la hipótesis nula de independencia y se concluye que la variable Survived depende de la variable Pclass, es decir, la supervivencia del pasajero depende de la clase del pasajero.
+
+**Contraste de hipótesis entre AgeGroup y Survived**
+
+Emplearemos el test Chi-square, con las siguientes hipótesis: 
+
+* Hipótesis nula: las variables son independientes.
+* Hipótesis alternativa: las variables son dependientes.
+
+Para comprobar la dependencia entre dos variables categóricas, se aplica el test chi-cuadrado. Pero antes es necesario crear la tabla de contingencia:
+
+```{r}
+tabla2 <- table(titanic_data$Survived, titanic_data$AgeGroup)
+tabla2
+plot(tabla2, col = c("red", "blue"), main = "Survived vs. AgreGroup")
+```
+
+A continuación se aplica el test chi-square sobre la tabla de contingencia:
+
+```{r warning=FALSE}
+chisq.test(tabla2)
+```
+
+Dado que p-value es inferior al nivel de significancia (< 0,05), se rechaza la hipótesis nula de independencia y se concluye que la variable Survived depende de la variable AgeGroup, es decir, la supervivencia del pasajero depende de la edad del pasajero.
+
+**Contraste de hipótesis entre Sex y Survived**
+
+Emplearemos el test Chi-square, con las siguientes hipótesis: 
+
+* Hipótesis nula: las variables son independientes.
+* Hipótesis alternativa: las variables son dependientes.
+
+Para comprobar la dependencia entre dos variables categóricas, se aplica el test chi-cuadrado. Pero antes es necesario crear la tabla de contingencia:
+
+```{r}
+tabla3 <- table(titanic_data$Survived, titanic_data$Sex)
+tabla3
+plot(tabla3, col = c("red", "blue"), main = "Survived vs. Sex")
+```
+
+A continuación se aplica el test chi-square sobre la tabla de contingencia:
+
+```{r}
+chisq.test(tabla3)
+```
+
+Dado que p-value es inferior al nivel de significancia (< 0,05), se rechaza la hipótesis nula de independencia y se concluye que la variable Survived depende de la variable Sex, es decir, la supervivencia del pasajero depende del sexo del pasajero.
+
+
+2. ¿Cuántas personas viajaban solas? ¿Y con familia? ¿Cómo se relaciona esto con la tasa de supervivencia?
+
+```{r}
+
+```
+
+3. ¿Tiene algo que ver el puerto de embarque con la tasa de supervivencia?
+
+```{r}
+
+```
 
 ## 5. Representación de los resultados a partir de tablas y gráficas.
 
