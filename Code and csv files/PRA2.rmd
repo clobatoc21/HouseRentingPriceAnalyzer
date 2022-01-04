@@ -6,13 +6,9 @@ output:
   html_document:
     toc: yes
     df_print: paged
-    fig_width: 4
-    fig_height: 4
   pdf_document:
     highlight: zenburn
     toc: yes
-    fig_width: 4
-    fig_height: 4
 subtitle: 'PRÁCTICA 2: Limpieza y análisis de datos'
 header-includes:
 - \usepackage {hyperref}
